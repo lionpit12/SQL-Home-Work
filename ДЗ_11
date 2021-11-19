@@ -1,0 +1,40 @@
+-- shop.logs definition
+
+CREATE TABLE `logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` datetime DEFAULT NULL,
+  `table_name` varchar(100) DEFAULT NULL,
+  `primary_key_id` bigint unsigned DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  UNIQUE KEY `id` (`id`)
+) ENGINE=ARCHIVE DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE catalogs ADD COLUMN created_at DATETIME DEFAULT NOW();
+
+DELIMITER //
+
+DROP TRIGGER IF EXISTS logger//
+CREATE TRIGGER logger AFTER INSERT ON catalogs
+FOR EACH ROW
+BEGIN
+	INSERT INTO logs(created_at,primary_key_id,name) VALUES (NEW.created_at, NEW.id, NEW.name);
+	INSERT INTO logs(table_name) VALUES ('catalogs');
+END//
+
+DELIMITER //
+DROP TRIGGER IF EXISTS logger_2//
+CREATE TRIGGER logger_2 AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+	INSERT INTO logs(created_at,primary_key_id,name) VALUES (NEW.created_at, NEW.id, NEW.name);
+	INSERT INTO logs(table_name) VALUES ('users');
+END//
+
+DELIMITER //
+DROP TRIGGER IF EXISTS logger_3//
+CREATE TRIGGER logger_3 AFTER INSERT ON products
+FOR EACH ROW
+BEGIN
+	INSERT INTO logs(created_at,primary_key_id,name) VALUES (NEW.created_at, NEW.id, NEW.name);
+	INSERT INTO logs(table_name) VALUES ('products');
+END//

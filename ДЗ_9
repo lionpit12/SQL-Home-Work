@@ -1,0 +1,78 @@
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) COMMENT 'Имя покупателя',
+  birthday_at DATE COMMENT 'Дата рождения',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) COMMENT = 'Покупатели';
+
+INSERT INTO users (name, birthday_at) VALUES
+  ('Геннадий', '1990-10-05'),
+  ('Наталья', '1984-11-12'),
+  ('Александр', '1985-05-20'),
+  ('Сергей', '1988-02-14'),
+  ('Иван', '1998-01-12'),
+  ('Мария', '1992-08-29');
+
+# Task 1
+START TRANSACTION;
+INSERT INTO sample.users (name, birthday_at) VALUES ('Геннадий', '1990-10-05');
+DELETE FROM shop.users WHERE id=1;
+COMMIT;
+
+SELECT * FROM users;
+
+# Task 2
+USE shop;
+CREATE VIEW prod AS SELECT p.id, p.name, c.name AS catalogs_name FROM products AS p JOIN catalogs AS c ON p.catalog_id=c.id;
+SELECT * FROM prod;
+
+# Task 4
+
+CREATE VIEW fresh_products AS SELECT p.created_at FROM products AS p ORDER BY p.created_at DESC LIMIT 5;
+SELECT * FROM fresh_products;
+
+# Task 5
+DELIMITER //
+DROP PROCEDURE  IF EXISTS hello_there;
+CREATE PROCEDURE  hello_there()
+BEGIN 
+	SET @x=SELECT current_time();
+		IF (@x BETWEEN 0 AND 12;) THEN 
+			SHOW  'Good morning';
+		ELSEIF (@x BETWEEN 12 AND 18;) THEN 
+			SHOW  'Good day';
+		ELSEIF  (@x BETWEEN 18 AND 24) THEN 
+			SHOW  'Good evening';
+		ELSE 
+			SHOW  'Good night';
+
+		END IF;
+
+END//
+
+# Task 6
+DELIMITER //
+DROP TRIGGER IF EXISTS auto_fill//
+CREATE TRIGGER auto_fill 
+	BEFORE INSERT 
+	ON  shop.products
+	FOR EACH ROW 
+	BEGIN 
+		IF NEW.name IS NULL THEN 
+    	SET NEW.name = 'not filled';
+   		END IF ;
+	END//
+
+DROP PROCEDURE IF EXISTS NOW3//
+CREATE PROCEDURE NOW3 ()
+BEGIN
+DECLARE i INT DEFAULT 3;
+cycle: LOOP
+SELECT NOW();
+SET i = i - 1;
+IF i <= 0 THEN LEAVE cycle;
+END IF;
+END LOOP cycle;
+END//

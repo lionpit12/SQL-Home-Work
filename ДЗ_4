@@ -1,0 +1,118 @@
+Homework N4 # Заполнил не все таблицы потому как Лень..
+USE vk;
+INSERT INTO `users`(`firstname`,`lastname`,`email`,`phone`)
+VALUES
+	('Bob','Bobson','bb@example.net','89009900'),
+	('Rob','Robson','rr@example.net','89991100'),
+	('Dog','Dogson','dd@example.net','89921101'),
+	('Hit','Hitson','hh@example.net','89011100'),
+	('Bill','Billson','bbi@example.net','89031100'),
+	('John','Johnson','jj@example.net','89951200'),
+	('Mike','Tyson','mt@example.net','89001210');
+
+
+INSERT INTO `users`
+SET
+	`firstname`= 'Meggie',
+	`lastname` = 'Crumbs',
+	`email` ='mc@example.net',
+	`phone` ='899100122'
+;
+
+INSERT INTO `profiles`(`user_id`, `gender`,`country`,`city`)
+VALUES
+
+	('1','m','USA','Boston'),
+	('2','m','USA','San Francisco'),
+	('3','m','USA','New Orlean'),
+	('4','m','USA','Seatle'),
+	('5','m','USA','Miami'),
+	('6','m','USA','Chikago'),
+	('7','m','USA','Washington'),
+	('8','f','USA','NY');
+
+
+INSERT INTO `communities` (`id`, `name`, `admin_user_id`)
+VALUES
+
+	('1', 'Dog lovers', '7'),
+	('2', 'Dog haters','6'),
+	('3','Programmer','1'),
+	('4','Maniaks','8'),
+	('5','Gamers','1'),
+	('6', 'Runners','7');
+	
+INSERT INTO `media_types` (`id`, `name`)
+VALUES
+
+	('1','audio/mpeg'),
+	('2','video'),
+	('3','image/gif'),
+	('4','image/jpeg'),
+	('5','text/css'),
+	('6','text/csv'),
+	('7','application/json'),
+	('8','application/pdf');
+	
+INSERT INTO `media` (`id`, `user_id`,`media_type_id`,`body`,`filename`)
+VALUES
+
+	('1','1','1','Helloween','masacre.txt'),
+	('2','3','4','Christmas_fotos','pics'),
+	('3','3','2','Rambo_3','action_movie'),
+	('4','6','2','God_father','thriller'),
+	('5','4','4','Vacations','vac33'),
+	('6','8','6','Poem','poem.txt'),
+	('7','2','2','workout','summer'),
+	('8','5','5','teambuilding','song'),
+	('9','7','7','NY','ny'),
+	('10','1','2','Travel','Japan');
+	
+INSERT INTO `friend_request` (`initiator_user_id`,`target_user_id`,`status`)
+VALUES
+
+	('1','8','requested'),
+	('8','4','requested'),
+	('2','7','requested'),
+	('5','8','requested'),
+	('7','5','requested'),
+	('1','2','requested'),
+	('5','6','declined'),
+	('3','1','approved'),
+	('1','6','approved'),
+	('5','4','requested');
+	
+DROP TABLE users_communities;
+
+
+INSERT INTO `messages` (`id`,`from_user_id`,`to_user_id`,`body`)
+VALUES
+
+	('1', '2','1','Hello, there!'),
+	('2', '2','8','Hello, there!'),
+	('3', '3','5','Hello, there!'),
+	('4', '5','6','Hello, there!'),
+	('5', '7','1','Hello, there!'),
+	('6', '5','4','Hello, there!'),
+	('7', '4','3','Hello, there!'),
+	('8', '2','6','Hello, there!'),
+	('9', '2','5','Hello, there!');
+	
+SELECT 
+DISTINCT firstname FROM users 
+ORDER BY firstname ASC
+;
+
+ALTER TABLE profiles 
+ADD COLUMN active_user 
+TINYINT  DEFAULT '1';
+
+UPDATE profiles 
+SET active_user='0'
+WHERE NOW() - birthday < '18';
+
+DELETE FROM messages 
+WHERE NOW() - created_at < 0;
+
+
+ 

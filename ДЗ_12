@@ -1,0 +1,107 @@
+ALTER TABLE opps ADD COLUMN product_id BIGINT UNSIGNED;
+ALTER TABLE easy_sale.products MODIFY COLUMN id BIGINT unsigned auto_increment PRIMARY KEY;
+ALTER TABLE opps ADD CONSTRAINT fk_product_id
+FOREIGN KEY (product_id) REFERENCES products(id)
+;
+ALTER TABLE easy_sale.products MODIFY COLUMN created_at datetime DEFAULT NOW() NULL;
+INSERT INTO easy_sale.products
+(name, description, price, created_at)
+VALUES
+	('Panasonic', 'Personal computer', 345, CURRENT_TIMESTAMP),
+	('Hitachi', 'TV', 500, CURRENT_TIMESTAMP),
+	('Toshiba', 'Music senter', 299, CURRENT_TIMESTAMP),
+	('Sumsung', 'Smart phone', 200, CURRENT_TIMESTAMP),
+	('Nokia', 'Notebook', 1000, CURRENT_TIMESTAMP),
+	('Visual', 'Smart watch', 200, CURRENT_TIMESTAMP),
+	('Sony', 'Notebook', 2000, CURRENT_TIMESTAMP),
+	('Huawai', 'Smart phone', 199, CURRENT_TIMESTAMP),
+	('Bolo', 'Frigde', 740, CURRENT_TIMESTAMP),
+	('Gojo', 'Washing machine', 650, CURRENT_TIMESTAMP)
+;
+ALTER TABLE opps DROP FOREIGN KEY fk_product_id;
+ALTER TABLE opps DROP COLUMN product_id;
+
+ALTER TABLE offers ADD COLUMN product_id BIGINT UNSIGNED;
+ALTER TABLE offers ADD CONSTRAINT fk_product_id
+FOREIGN KEY (product_id) REFERENCES products(id)
+;
+
+CREATE OR REPLACE VIEW qualification (id, name, comment)
+AS SELECT opp_id, opp_name, comment FROM opps;
+
+SELECT * FROM qualification;
+
+CREATE OR REPLACE VIEW offers_made (id, name, payment, total)
+AS SELECT offer_id, products, payment_terms, total FROM offers ORDER BY total DESC;
+
+SELECT 
+	opp_id,
+	opp_name,
+	(SELECT total FROM offers WHERE offers.opp_id=opps.opp_id AND total>500) AS total,
+	(SELECT first_name FROM easy_sale.contacts WHERE contacts.id =opps.contact_id) AS name,
+	(SELECT last_name FROM easy_sale.contacts WHERE contacts.id =opps.contact_id) AS family_name
+FROM opps
+ORDER BY total DESC 
+;
+
+SELECT 
+	opp_id,
+	opp_name,
+	(SELECT description FROM tasks WHERE tasks.id=opps.opp_id) AS task_description,
+	(SELECT deadline FROM tasks WHERE tasks.id=opps.opp_id) AS deadline
+FROM opps
+WHERE opp_status='proposal'
+;
+
+SELECT 
+	o.opp_id,
+	o.opp_name AS name,
+	t.description,
+	t.deadline,
+	v.visit_type,
+	offers.total
+FROM 
+	opps AS o
+JOIN tasks AS t ON t.opp_id =o.opp_id 
+JOIN visits AS v ON v.opp_id =o.opp_id 
+JOIN offers ON offers.opp_id =o.opp_id 
+
+WHERE total > 1000
+;
+
+SELECT 
+	o.opp_id,
+	t.name,
+	t.last_name,
+	id,
+	description
+FROM tasks 
+JOIN opps AS o ON o.opp_id=tasks.opp_id AND o.opp_status='proposal'
+JOIN team AS t ON t.member_id =team_id 
+WHERE NOW()-deadline<0
+;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS tasks_run//
+CREATE PROCEDURE tasks_run ()
+BEGIN
+	DECLARE i INT DEFAULT 3;
+	WHILE i > 0 DO
+	SELECT id FROM tasks ;
+	SET i = i - 1;
+	END WHILE;
+END//
+
+CALL tasks_run();
+
+DELIMITER //
+DROP TRIGGER IF EXISTS check_opps//
+CREATE TRIGGER check_opps BEFORE DELETE ON opps
+FOR EACH ROW 
+BEGIN
+	DECLARE total INT;
+	SELECT COUNT(*) INTO total FROM opps;
+	IF total <= 1 THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'DELETE canceled';
+	END IF;
+END//

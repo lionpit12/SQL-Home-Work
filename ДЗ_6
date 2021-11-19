@@ -1,0 +1,69 @@
+# Task No 1
+SELECT 	
+	from_user_id,
+	COUNT(from_user_id) AS 'number of msgs',
+
+	(SELECT firstname 
+	FROM users 
+	WHERE id=from_user_id) AS 'name',
+	
+	(SELECT lastname 
+	FROM users 
+	WHERE id=from_user_id) AS 'lastname'
+		
+FROM messages 
+WHERE to_user_id = 1 
+
+GROUP BY from_user_id
+LIMIT 1
+
+# Task No 2
+
+SELECT
+	user_id
+
+FROM likes 
+
+WHERE user_id IN 
+
+	(SELECT 
+		user_id
+	
+	FROM profiles 
+	
+	WHERE  TIMESTAMPDIFF (YEAR, birthday, now()) < 10)
+;
+
+# Task No 3
+SELECT 
+	(SELECT 
+		#user_id,
+		
+		COUNT(user_id) AS 'likes from females'
+		
+	FROM likes 
+	
+	WHERE user_id IN 
+		(SELECT 
+			user_id
+		FROM profiles 
+		
+		WHERE gender = 'f')) AS 'likes from females',
+
+
+	(SELECT 
+		#user_id,
+		
+		COUNT(user_id) AS 'likes from males'
+		
+	FROM likes 
+	
+	WHERE user_id IN 
+		(SELECT 
+			user_id
+		FROM profiles 
+		
+		WHERE gender = 'm')) AS 'likes from males'
+FROM likes
+LIMIT 1
+;

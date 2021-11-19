@@ -1,0 +1,36 @@
+# Task No 1
+ALTER TABLE orders
+MODIFY COLUMN user_id BIGINT UNSIGNED;
+
+ALTER TABLE orders 
+ADD CONSTRAINT FK_PersonOrder
+FOREIGN KEY (user_id) REFERENCES users(id);
+
+SELECT 
+	id
+FROM 
+	users 
+WHERE 
+	id = (SELECT user_id FROM orders)
+;
+
+# Task No 2
+
+SELECT
+	id, name, catalog_id
+FROM
+	products
+WHERE
+	catalog_id IN (SELECT id FROM catalogs);
+	
+# Task No 3
+
+SELECT 
+	`from`,`to`
+FROM 
+	flights AS f
+JOIN 
+	cities AS c
+WHERE 
+	c.label= f
+;

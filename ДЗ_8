@@ -1,0 +1,50 @@
+# Task No 1
+SELECT 
+	(SELECT firstname FROM users WHERE id=from_user_id) AS 'name',
+	(SELECT lastname FROM users WHERE id=from_user_id) AS 'lastname',
+	COUNT(from_user_id) AS 'number of msgs'
+	
+FROM 
+	messages AS m
+JOIN users ON m.from_user_id=users.id
+
+WHERE 
+	m.to_user_id=1
+	
+GROUP BY 
+	m.from_user_id 
+LIMIT 1;
+
+# Task No 2
+
+ALTER TABLE likes 
+ADD FOREIGN KEY (user_id)
+REFERENCES profiles(user_id)
+ON DELETE CASCADE 
+ON UPDATE CASCADE
+;
+
+SELECT 
+	l.user_id ,
+	u.firstname,
+	u.lastname,
+	p.birthday 
+FROM 
+	likes AS l
+JOIN users AS u ON l.user_id = u.id
+JOIN profiles AS p ON l.user_id=p.user_id 
+WHERE 
+	TIMESTAMPDIFF (YEAR, birthday, now()) < 10
+;
+
+# Task No 3
+
+SELECT 
+	COUNT(l.id) AS 'Количество сообщений',
+	p.gender AS 'Пол'
+	
+FROM likes AS l
+JOIN profiles AS p ON l.user_id = p.user_id 
+GROUP BY 
+	p.gender
+;
